@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TrackWise — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050810;
+      --surface: #0d1117;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(99,102,241,0.5);
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    .bg-canvas {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(245,158,11,0.07) 0%, transparent 50%),
+                  radial-gradient(ellipse at 60% 90%, rgba(16,185,129,0.06) 0%, transparent 50%),
+                  var(--bg);
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+      animation: floatOrb 8s ease-in-out infinite;
+    }
+    .orb1 { width: 400px; height: 400px; background: rgba(99,102,241,0.15); top: -100px; left: -100px; animation-delay: 0s; }
+    .orb2 { width: 300px; height: 300px; background: rgba(245,158,11,0.1); bottom: -50px; right: 100px; animation-delay: -3s; }
+    .orb3 { width: 250px; height: 250px; background: rgba(16,185,129,0.08); top: 50%; right: -50px; animation-delay: -5s; }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(20px, -20px) scale(1.05); }
+      66% { transform: translate(-10px, 15px) scale(0.97); }
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      min-height: 100vh;
+      position: relative; z-index: 1;
+      gap: 0;
+    }
+
+    /* Left panel - Brand */
+    .brand-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 50px;
+      position: relative;
+    }
+
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 60px;
+      animation: fadeSlideUp 0.6s ease both;
+    }
+
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 30px rgba(99,102,241,0.4);
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span { color: var(--accent2); }
+
+    .hero-headline {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      animation: fadeSlideUp 0.6s ease 0.1s both;
+    }
+
+    .hero-headline .accent { color: var(--accent2); }
+    .hero-headline .gold { color: var(--gold); }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 50px;
+      animation: fadeSlideUp 0.6s ease 0.2s both;
+    }
+
+    .stats-row {
+      display: flex; gap: 30px;
+      animation: fadeSlideUp 0.6s ease 0.3s both;
+    }
+
+    .stat-item { }
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: var(--text);
+    }
+    .stat-val .u { font-size: 16px; color: var(--accent2); }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .stat-divider { width: 1px; background: var(--border); }
+
+    /* Features list */
+    .features {
+      margin-top: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeSlideUp 0.6s ease 0.4s both;
+    }
+
+    .feature-item {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px; color: var(--muted);
+    }
+
+    .feature-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      flex-shrink: 0;
+    }
+
+    /* Right panel - Auth form */
+    .auth-panel {
+      width: 460px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .auth-card {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      animation: fadeSlideUp 0.6s ease 0.1s both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    /* Tab switcher */
+    .tabs {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+
+    .tab {
+      flex: 1; padding: 10px;
+      text-align: center;
+      border: none; background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      border-radius: 9px;
+      transition: all 0.25s;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+    }
+
+    /* Form */
+    .form-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      display: block;
+      font-size: 12px; font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex; align-items: center;
+    }
+
+    .input-icon {
+      position: absolute; left: 14px;
+      font-size: 16px; pointer-events: none;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px 12px 44px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.06);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+
+    .form-input:focus + .focus-ring { opacity: 1; }
+
+    .form-input::placeholder { color: rgba(100,116,139,0.6); }
+
+    .toggle-pw {
+      position: absolute; right: 14px;
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+    .toggle-pw:hover { color: var(--text); }
+
+    .password-strength {
+      margin-top: 8px;
+      display: none;
+    }
+
+    .strength-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .strength-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .row-group {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+
+    .remember-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .checkbox-wrap {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+    }
+
+    .custom-checkbox {
+      width: 16px; height: 16px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    #rememberMe:checked ~ .custom-checkbox-label .custom-checkbox {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .checkbox-label { font-size: 13px; color: var(--muted); }
+
+    .forgot-link {
+      font-size: 13px;
+      color: var(--accent2);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--text); }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative; overflow: hidden;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99,102,241,0.5);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-submit.loading .btn-text { opacity: 0; }
+    .btn-submit.loading .btn-spinner { display: block; }
+
+    .btn-spinner {
+      display: none;
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    /* Alert messages */
+    .alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      border: 1px solid;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert.show { display: flex; animation: slideDown 0.3s ease; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-error {
+      background: rgba(239,68,68,0.1);
+      border-color: rgba(239,68,68,0.3);
+      color: #fca5a5;
+    }
+
+    .alert-success {
+      background: rgba(16,185,129,0.1);
+      border-color: rgba(16,185,129,0.3);
+      color: #6ee7b7;
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0;
+      color: var(--muted); font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+
+    .demo-accounts {
+      margin-top: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .demo-title {
+      font-size: 11px; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .demo-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 6px;
+    }
+    .demo-btn:last-child { margin-bottom: 0; }
+    .demo-btn:hover { background: rgba(99,102,241,0.1); border-color: var(--accent); }
+
+    .demo-avatar {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+    }
+
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+
+    /* Animations */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .brand-panel { display: none; }
+      .auth-panel { width: 100%; max-width: 480px; }
+    }
+    /* Forgot Password Modal */
+    .fp-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+    .fp-overlay.open { display: flex; animation: fadeInModal 0.25s ease; }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .fp-modal {
+      background: #0f1623;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      padding: 0;
+      animation: slideUpModal 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fp-modal::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+    }
+
+    @keyframes slideUpModal {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fp-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px; font-weight: 700;
+    }
+
+    .fp-close {
+      background: none; border: none;
+      color: var(--muted); font-size: 22px;
+      cursor: pointer; padding: 2px 6px;
+      border-radius: 6px;
+      transition: all 0.2s; line-height: 1;
+    }
+    .fp-close:hover { color: var(--text); background: var(--border); }
+
+    .fp-body { padding: 24px; }
+
+    .fp-step { display: none; }
+    .fp-step.active { display: block; animation: fadeSlideUp 0.3s ease; }
+
+    .fp-icon {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .fp-desc {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .fp-success-box {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .fp-success-icon {
+      font-size: 56px;
+      margin-bottom: 14px;
+    }
+
+    .fp-success-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--green);
+    }
+
+    .fp-success-msg {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .step-indicator {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .step-dot.done { background: var(--green); }
+    /* Forgot Password Modal */
+    .fp-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 300;
+      align-items: center; justify-content: center;
+    }
+    .fp-overlay.open { display: flex; animation: fadeIn2 0.25s ease; }
+    @keyframes fadeIn2 { from { opacity:0; } to { opacity:1; } }
+
+    .fp-modal {
+      background: #0f1623;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      width: 100%; max-width: 420px;
+      position: relative; overflow: hidden;
+      animation: slideUp2 0.3s ease;
+    }
+    .fp-modal::before {
+      content:''; position:absolute; top:0; left:0; right:0;
+      height:2px;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+    }
+    @keyframes slideUp2 {
+      from { opacity:0; transform:translateY(30px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .fp-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .fp-title { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
+    .fp-close {
+      background:none; border:none; color:var(--muted);
+      font-size:22px; cursor:pointer; padding:2px 6px;
+      border-radius:6px; transition:all 0.2s; line-height:1;
+    }
+    .fp-close:hover { color:var(--text); background:var(--border); }
+    .fp-body { padding: 24px; }
+    .fp-step { display:none; }
+    .fp-step.active { display:block; animation: fadeSlideUp 0.3s ease; }
+    .fp-icon { text-align:center; font-size:48px; margin-bottom:12px; }
+    .fp-desc { font-size:13px; color:var(--muted); text-align:center; margin-bottom:22px; line-height:1.6; }
+    .step-indicator { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:24px; }
+    .step-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:all 0.3s; }
+    .step-dot.active { background:var(--accent); width:24px; border-radius:4px; }
+    .step-dot.done { background:var(--green); }
+  </style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="grid-overlay"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="layout">
+  <!-- Brand Panel -->
+  <div class="brand-panel">
+    <div class="logo-mark">
+      <div class="logo-icon">📊</div>
+      <div class="logo-text">Track<span>Wise</span></div>
+    </div>
+
+    <h1 class="hero-headline">
+      Relational<br/>
+      <span class="accent">Expense</span><br/>
+      <span class="gold">Analytics</span>
+    </h1>
+
+    <p class="hero-sub">
+      The intelligent financial platform built for clarity. Track every rupee, uncover patterns, and make smarter money decisions.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-val">360<span class="u">°</span></div>
+        <div class="stat-label">Financial View</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-val">Real<span class="u">-time</span></div>
+        <div class="stat-label">Analytics</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-val">Multi<span class="u">-user</span></div>
+        <div class="stat-label">Isolation</div>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature-item"><div class="feature-dot"></div>Category-wise budget tracking & alerts</div>
+      <div class="feature-item"><div class="feature-dot"></div>Income vs Expense trend analysis</div>
+      <div class="feature-item"><div class="feature-dot"></div>Payment method breakdown</div>
+      <div class="feature-item"><div class="feature-dot"></div>Interactive charts & monthly reports</div>
+    </div>
+  </div>
+
+  <!-- Auth Panel -->
+  <div class="auth-panel">
+    <div class="auth-card">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert alert-error" id="alertBox">
+        <span>⚠️</span>
+        <span id="alertMsg"></span>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="form-panel active" id="loginPanel">
+        <div class="form-title">Welcome back</div>
+        <div class="form-sub">Sign in to your TrackWise account</div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" autocomplete="current-password"/>
+            <button class="toggle-pw" onclick="togglePw('loginPassword', this)" type="button">👁️</button>
+          </div>
+        </div>
+
+        <div class="remember-row">
+          <label class="checkbox-wrap" onclick="toggleCheckbox(this)">
+            <div class="custom-checkbox" id="rememberCheckbox" style="background: transparent;">
+              <span id="checkMark" style="display:none; color:#fff; font-size:10px;">✓</span>
+            </div>
+            <span class="checkbox-label">Remember me</span>
+          </label>
+          <a href="#" class="forgot-link" onclick="openForgotModal(); return false;">Forgot password?</a>
+        </div>
+
+        <button class="btn-submit" id="loginBtn" onclick="handleLogin()">
+          <span class="btn-text">Sign In →</span>
+          <span class="btn-spinner"></span>
+        </button>
+
+        <div class="divider">quick access</div>
+
+        <div class="demo-accounts">
+          <div class="demo-title">Demo Accounts</div>
+          <button class="demo-btn" onclick="fillDemo('alice@demo.com','Demo@123')">
+            <div class="demo-avatar" style="background:#4f46e5">A</div>
+            <div><div style="font-weight:500">Alice Johnson</div><div style="color:#64748b"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="22434e4b41476246474f4d0c414d4f">[email&#160;protected]</a></div></div>
+          </button>
+          <button class="demo-btn" onclick="fillDemo('bob@demo.com','Demo@123')">
+            <div class="demo-avatar" style="background:#059669">B</div>
+            <div><div style="font-weight:500">Bob Smith</div><div style="color:#64748b"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c1a3aea381a5a4acaeefa2aeac">[email&#160;protected]</a></div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="form-panel" id="registerPanel">
+        <div class="form-title">Create account</div>
+        <div class="form-sub">Start tracking your expenses today</div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" class="form-input" id="regName" placeholder="Your full name"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" class="form-input" id="regEmail" placeholder="you@example.com"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="regPassword" placeholder="Min. 8 characters" oninput="checkStrength(this.value)"/>
+            <button class="toggle-pw" onclick="togglePw('regPassword', this)" type="button">👁️</button>
+          </div>
+          <div class="password-strength" id="strengthMeter">
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <div class="strength-label" id="strengthLabel">Weak</div>
+          </div>
+        </div>
+
+        <div class="row-group">
+          <div class="form-group">
+            <label class="form-label">Monthly Budget</label>
+            <div class="input-wrap">
+              <span class="input-icon">💰</span>
+              <input type="number" class="form-input" id="regBudget" placeholder="5000" style="padding-left:44px"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Currency</label>
+            <div class="input-wrap">
+              <span class="input-icon">🌐</span>
+              <select class="form-input" id="regCurrency">
+                <option value="INR">INR ₹</option>
+                <option value="USD">USD $</option>
+                <option value="EUR">EUR €</option>
+                <option value="GBP">GBP £</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="registerBtn" onclick="handleRegister()">
+          <span class="btn-text">Create Account →</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const API = '';
+let rememberedEmail = localStorage.getItem('tw_email') || '';
+if (rememberedEmail) document.getElementById('loginEmail').value = rememberedEmail;
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+  });
+  document.getElementById('loginPanel').classList.toggle('active', tab === 'login');
+  document.getElementById('registerPanel').classList.toggle('active', tab === 'register');
+  hideAlert();
+}
+
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+}
+
+let rememberMe = false;
+function toggleCheckbox(el) {
+  rememberMe = !rememberMe;
+  const box = document.getElementById('rememberCheckbox');
+  const mark = document.getElementById('checkMark');
+  box.style.background = rememberMe ? '#6366f1' : 'transparent';
+  box.style.borderColor = rememberMe ? '#6366f1' : '';
+  mark.style.display = rememberMe ? 'block' : 'none';
+}
+
+function showAlert(msg, type = 'error') {
+  const box = document.getElementById('alertBox');
+  const msgEl = document.getElementById('alertMsg');
+  box.className = `alert alert-${type} show`;
+  msgEl.textContent = msg;
+  box.querySelector('span').textContent = type === 'error' ? '⚠️' : '✅';
+}
+
+function hideAlert() {
+  document.getElementById('alertBox').classList.remove('show');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.classList.toggle('loading', loading);
+  btn.disabled = loading;
+}
+
+function fillDemo(email, password) {
+  document.getElementById('loginEmail').value = email;
+  document.getElementById('loginPassword').value = password;
+  hideAlert();
+}
+
+function checkStrength(pw) {
+  const meter = document.getElementById('strengthMeter');
+  const fill = document.getElementById('strengthFill');
+  const label = document.getElementById('strengthLabel');
+  meter.style.display = pw.length ? 'block' : 'none';
+
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  const levels = [
+    { pct: '25%', color: '#ef4444', text: 'Weak' },
+    { pct: '50%', color: '#f97316', text: 'Fair' },
+    { pct: '75%', color: '#eab308', text: 'Good' },
+    { pct: '100%', color: '#10b981', text: 'Strong' }
+  ];
+  const l = levels[Math.max(0, score - 1)] || levels[0];
+  fill.style.width = l.pct;
+  fill.style.background = l.color;
+  label.textContent = l.text;
+  label.style.color = l.color;
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) return showAlert('Please enter email and password');
+
+  setLoading('loginBtn', true);
+  hideAlert();
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('tw_token', data.token);
+      localStorage.setItem('tw_user', JSON.stringify(data.user));
+      if (rememberMe) localStorage.setItem('tw_email', email);
+      showAlert('Login successful! Redirecting...', 'success');
+      setTimeout(() => window.location.href = '/dashboard', 800);
+    } else {
+      showAlert(data.error || 'Invalid credentials');
+    }
+  } catch (e) {
+    showAlert('Connection failed. Is the server running?');
+  } finally {
+    setLoading('loginBtn', false);
+  }
+}
+
+async function handleRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const monthly_budget = document.getElementById('regBudget').value;
+  const currency = document.getElementById('regCurrency').value;
+
+  if (!name || !email || !password) return showAlert('Please fill all required fields');
+  if (password.length < 8) return showAlert('Password must be at least 8 characters');
+
+  setLoading('registerBtn', true);
+  hideAlert();
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, monthly_budget: parseFloat(monthly_budget) || 5000, currency })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('tw_token', data.token);
+      localStorage.setItem('tw_user', JSON.stringify(data.user));
+      showAlert('Account created! Setting up your dashboard...', 'success');
+      setTimeout(() => window.location.href = '/dashboard', 1000);
+    } else {
+      showAlert(data.error || 'Registration failed');
+    }
+  } catch (e) {
+    showAlert('Connection failed. Is the server running?');
+  } finally {
+    setLoading('registerBtn', false);
+  }
+}
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('loginPanel').classList.contains('active')) handleLogin();
+    else handleRegister();
+  }
+});
+
+
+// Redirect if already logged in
+const existingToken = localStorage.getItem('tw_token');
+if (existingToken) {
+  fetch('/api/auth/me', { headers: { Authorization: `Bearer ${existingToken}` } })
+    .then(r => r.json())
+    .then(d => { if (d.success) window.location.href = '/dashboard'; })
+    .catch(() => {});
+}
+</script>
+
+<!-- ===== FORGOT PASSWORD MODAL ===== -->
+<div class="fp-overlay" id="fpOverlay" onclick="if(event.target===this) closeForgotModal()">
+  <div class="fp-modal">
+    <div class="fp-header">
+      <div class="fp-title" id="fpTitle">Reset Password</div>
+      <button class="fp-close" onclick="closeForgotModal()">×</button>
+    </div>
+    <div class="fp-body">
+      <div class="step-indicator">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+      </div>
+
+      <!-- STEP 1: Enter Email -->
+      <div class="fp-step active" id="fpStep1">
+        <div class="fp-icon">📧</div>
+        <div class="fp-desc">Enter your registered email address. We will verify your account and let you set a new password.</div>
+        <div class="form-group">
+          <label class="form-label">Registered Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" class="form-input" id="fpEmail" placeholder="you@example.com"/>
+          </div>
+        </div>
+        <div class="alert alert-error" id="fpAlert1" style="margin-top:12px">
+          <span>⚠️</span><span id="fpAlertMsg1"></span>
+        </div>
+        <button class="btn-submit" id="fpBtn1" onclick="verifyEmail()" style="margin-top:16px">
+          <span class="btn-text">Verify Email →</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </div>
+
+      <!-- STEP 2: Set New Password -->
+      <div class="fp-step" id="fpStep2">
+        <div class="fp-icon">🔐</div>
+        <div class="fp-desc">Email verified! Now set your new password below.</div>
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="fpNewPw" placeholder="Min. 8 characters"/>
+            <button class="toggle-pw" onclick="togglePw('fpNewPw', this)" type="button">👁️</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="form-input" id="fpConfirmPw" placeholder="Repeat new password"/>
+            <button class="toggle-pw" onclick="togglePw('fpConfirmPw', this)" type="button">👁️</button>
+          </div>
+        </div>
+        <div class="alert alert-error" id="fpAlert2" style="margin-top:12px">
+          <span>⚠️</span><span id="fpAlertMsg2"></span>
+        </div>
+        <button class="btn-submit" id="fpBtn2" onclick="resetPassword()" style="margin-top:16px">
+          <span class="btn-text">Reset Password →</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </div>
+
+      <!-- STEP 3: Success -->
+      <div class="fp-step" id="fpStep3">
+        <div style="text-align:center; padding:10px 0">
+          <div style="font-size:56px; margin-bottom:14px">🎉</div>
+          <div style="font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#10b981; margin-bottom:8px">Password Reset!</div>
+          <div style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:20px">Your password has been successfully updated. You can now sign in with your new password.</div>
+          <button class="btn-submit" onclick="closeForgotModal(); switchTab('login')">
+            <span class="btn-text">Go to Sign In →</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Forgot Password Logic ─────────────────────
+let fpEmail = '';
+
+function openForgotModal() {
+  fpEmail = '';
+  fpGoStep(1);
+  document.getElementById('fpEmail').value = '';
+  document.getElementById('fpNewPw').value = '';
+  document.getElementById('fpConfirmPw').value = '';
+  hideFpAlert(1); hideFpAlert(2);
+  document.getElementById('fpOverlay').classList.add('open');
+}
+
+function closeForgotModal() {
+  document.getElementById('fpOverlay').classList.remove('open');
+}
+
+function fpGoStep(step) {
+  [1,2,3].forEach(i => {
+    document.getElementById('fpStep' + i).classList.toggle('active', i === step);
+    const dot = document.getElementById('dot' + i);
+    dot.classList.remove('active','done');
+    if (i < step) dot.classList.add('done');
+    else if (i === step) dot.classList.add('active');
+  });
+  const titles = {1:'Reset Password', 2:'Set New Password', 3:'All Done!'};
+  document.getElementById('fpTitle').textContent = titles[step];
+}
+
+function showFpAlert(step, msg) {
+  const box = document.getElementById('fpAlert' + step);
+  document.getElementById('fpAlertMsg' + step).textContent = msg;
+  box.classList.add('show');
+}
+
+function hideFpAlert(step) {
+  const box = document.getElementById('fpAlert' + step);
+  if (box) box.classList.remove('show');
+}
+
+async function verifyEmail() {
+  const email = document.getElementById('fpEmail').value.trim();
+  if (!email) return showFpAlert(1, 'Please enter your email address');
+  hideFpAlert(1);
+  setLoading('fpBtn1', true);
+  try {
+    const res = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (data.success && data.exists) {
+      fpEmail = email;
+      fpGoStep(2);
+    } else {
+      showFpAlert(1, 'No account found with this email address.');
+    }
+  } catch (e) {
+    showFpAlert(1, 'Connection failed. Is the server running?');
+  } finally {
+    setLoading('fpBtn1', false);
+  }
+}
+
+async function resetPassword() {
+  const newPw = document.getElementById('fpNewPw').value;
+  const confirmPw = document.getElementById('fpConfirmPw').value;
+  hideFpAlert(2);
+  if (!newPw || !confirmPw) return showFpAlert(2, 'Please fill both password fields');
+  if (newPw.length < 8) return showFpAlert(2, 'Password must be at least 8 characters');
+  if (newPw !== confirmPw) return showFpAlert(2, 'Passwords do not match');
+  setLoading('fpBtn2', true);
+  try {
+    const res = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: fpEmail, new_password: newPw })
+    });
+    const data = await res.json();
+    if (data.success) fpGoStep(3);
+    else showFpAlert(2, data.error || 'Reset failed. Please try again.');
+  } catch (e) {
+    showFpAlert(2, 'Connection failed. Is the server running?');
+  } finally {
+    setLoading('fpBtn2', false);
+  }
+}
+</script>
+
+</body>
+</html>
